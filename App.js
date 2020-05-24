@@ -12,51 +12,67 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      textoFrase: "",
-      img: require("./src/assets/biscoito.png"),
+      numero: 0,
+      botao: "Start",
+      ultimo: null,
     };
-
-    this.quebraBiscoito = this.quebraBiscoito.bind(this);
-
-    this.frases = [
-      " A vida trará coisas boas se tiveres paciência.",
-      "Demonstre amor e alegria em todas as oportunidades e verás que a paz nasce dentro de você.",
-      "Não compense na ira o que lhe falta na razão.",
-      "Defeitos e virtudes são apenas dois lados da mesma moeda.",
-      "A maior de todas as torres começa no solo.",
-      "Não há que ser forte. Há que ser flexível.",
-      "Gente todo dia arruma os cabelos, por que não o coração?",
-      "Há três coisas que jamais voltam; a flecha lançada, a palavra dita e a oportunidade perdida.",
-      "A juventude não é uma época da vida, é um estado de espírito.",
-      "Podemos escolher o que semear, mas somos obrigados a colher o que plantamos.",
-      "Dê toda a atenção para a formação dos teus filhos, sobretudo por exemplos de tua própria vida.",
-      "Siga os bons e aprenda com eles.",
-      "Não importa o tamanho da montanha, ela não pode tapar o sol.",
-      "O bom-senso vai mais longe do que muito conhecimento.",
-      "Quem quer colher rosas deve suportar os espinhos.",
-    ];
+    this.timer = null;
+    this.start = this.start.bind(this);
+    this.stop = this.stop.bind(this);
   }
 
-  quebraBiscoito() {
-    let nAleatorio = Math.floor(Math.random() * this.frases.length);
+  start() {
+    if (this.timer != null) {
+      clearInterval(this.timer);
+      this.timer = null;
+      this.setState({ botao: "Start" });
+    } else {
+      this.timer = setInterval(() => {
+        this.setState({ numero: this.state.numero + 0.1 });
+      }, 100);
+      this.setState({ botao: "Pausar" });
+    }
+  }
 
+  stop() {
+    if (this.timer != null) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
     this.setState({
-      textoFrase: '" ' + this.frases[nAleatorio] + '"',
-      img: require("./src/assets/biscoitoAberto.png"),
+      ultimo: this.state.numero,
+      numero: 0,
+      botao: "Start",
     });
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <Image source={this.state.img} style={styles.img} />
-        <Text style={styles.textoFrase}> {this.state.textoFrase} </Text>
+        <Image
+          saource={require("./src/assets/cronometro.png")}
+          style={styles.cronometro}
+        />
 
-        <TouchableOpacity style={styles.botao} onPress={this.quebraBiscoito}>
-          <View style={styles.btnArea}>
-            <Text style={styles.btntexto}>Quebrar o biscoito</Text>
-          </View>
-        </TouchableOpacity>
+        <Text style={styles.timer}>{this.state.numero.toFixed(1)}</Text>
+
+        <View style={styles.btnArea}>
+          <TouchableOpacity style={styles.botao} onPress={this.start}>
+            <Text style={styles.btnTexto}> {this.state.botao}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.botao} onPress={this.stop}>
+            <Text style={styles.btnTexto}> Stop</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.areaUltimo}>
+          <Text style={styles.textoCorrida}>
+            {this.state.ultimo > 0
+              ? "Último tempo: " + this.state.ultimo.toFixed(2)
+              : " "}
+          </Text>
+        </View>
       </View>
     );
   }
@@ -67,39 +83,46 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  img: {
-    width: 250,
-    height: 250,
+    backgroundColor: "#00aeef",
   },
 
-  textoFrase: {
-    fontSize: 20,
-    color: "#dd7b22",
-    margin: 30,
-    fontStyle: "italic",
-    textAlign: "center",
-  },
-
-  botao: {
-    width: 230,
-    height: 50,
-    borderWidth: 2,
-    borderColor: "#000080",
-    borderRadius: 25,
+  timer: {
+    marginTop: -160,
+    color: "#FFF",
+    fontSize: 65,
+    fontWeight: "bold",
   },
 
   btnArea: {
-    flex: 1,
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    marginTop: 70,
+    height: 40,
   },
 
-  btntexto: {
-    fontSize: 18,
+  botao: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFF",
+    height: 40,
+    margin: 17,
+    borderRadius: 20,
+  },
+
+  btnTexto: {
+    fontSize: 20,
     fontWeight: "bold",
-    color: "#000080",
+    color: "#00aeef",
+  },
+
+  areaUltimo: {
+    marginTop: 40,
+  },
+
+  textoCorrida: {
+    fontSize: 25,
+    fontStyle: "italic",
+    color: "#FFF",
   },
 });
 
